@@ -36,6 +36,3 @@ for ($i = 0; $i < 20; $i++) {
     $book->category_id = $faker->numberBetween(1, 5);
     $book->save();
 }
-
-
-

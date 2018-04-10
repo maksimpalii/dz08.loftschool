@@ -4,17 +4,6 @@ namespace App;
 
 class Api extends MainController
 {
-    //GET /users - получить список всех юзеров //getUsers
-//POST /users - создать юзера //storeUser //createUser //sozdatUser
-//GET /users/1 - получить юзера №1 //getUserById
-//PUT/PATCH /users/1 - обновить юзера №1 //updateUserById
-//DELETE /users/1 - удалить юзера №1 //deleteUserByid
-//DELETE /users - массовое удаление юзеров //deleteUsers
-//if (empty($_COOKIE['authorized'])) {
-//    http_response_code(401);
-//    echo "auth first";
-//}
-
     public function books()
     {
         $requestmethod = empty($_POST['_method']) ? strtoupper($_SERVER['REQUEST_METHOD']) : $_POST['_method'];
@@ -43,14 +32,18 @@ class Api extends MainController
 
     public function responseUpdate()
     {
+
+        $_REQUEST['id'] = $this->routes();
         if (!empty($_REQUEST['id'])) {
             $book = Book::find($_REQUEST['id']);
             if (empty($book)) {
                 http_response_code(404);
                 echo "Failed to update: 404 not found";
             } else {
-                if (!empty($_REQUEST['name'])) {
+                if (!empty($_REQUEST['name']) && !empty($_REQUEST['description']) && !empty($_REQUEST['category_id'])) {
                     $book->name = strip_tags($_REQUEST['name']);
+                    $book->description = strip_tags($_REQUEST['description']);
+                    $book->category_id = strip_tags($_REQUEST['category_id']);
                     $book->save();
                     echo "user updated";
                 } else {
@@ -79,6 +72,9 @@ class Api extends MainController
         } else {
             http_response_code(422);
             echo "Field 'id' required";
+//            $book = new Book();
+//            $book::truncate();
+//            echo "All User deleted";
         }
     }
 
@@ -93,38 +89,23 @@ class Api extends MainController
             $book->description = $_POST['description'];
             $book->category_id = $_POST['category_id'];
             $book->save();
-            echo $book;
+            echo json_encode($book);
         }
     }
 
     public function responseGet()
     {
-
-//        if (!empty($this->routes())) {
-//            $book = Book::find($this->routes());
-//            if (empty($book)) {
-//                http_response_code(404);
-//                echo "404 not found";
-//            } else {
-//                echo $book;
-//                //print_r(json_encode($book, JSON_UNESCAPED_UNICODE));
-//            }
-//        } else {
-//            // print_r(json_encode(Book::all(), JSON_UNESCAPED_UNICODE));
-//            echo Book::all();
-//        }
         $_GET['id'] = $this->routes();
         if (!empty($_GET['id'])) {
-            $user = Book::find($_GET['id']);
-            if (empty($user)) {
+            $book = Book::find($_GET['id']);
+            if (empty($book)) {
                 http_response_code(404);
                 echo "404 not found";
             } else {
-                echo json_encode($user);
+                echo json_encode($book);
             }
         } else {
             echo json_encode(Book::all());
         }
     }
-
 }
